@@ -1,25 +1,28 @@
-'use client';
-import { ChevronUp } from 'lucide-react';
-import Image from 'next/image';
-import type { User } from 'next-auth';
-import { signOut } from 'next-auth/react';
-import { useTheme } from 'next-themes';
+"use client"
+import { ChevronUp } from "lucide-react"
+import Image from "next/image"
+import { useClerk, useUser } from "@clerk/nextjs"
+import { useTheme } from "next-themes"
 
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu"
 import {
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
-} from '@/components/ui/sidebar';
+  SidebarMenuItem
+} from "@/components/ui/sidebar"
 
-export function SidebarUserNav({ user }: { user: User }) {
-  const { setTheme, theme } = useTheme();
+export function SidebarUserNav() {
+  const { setTheme, theme } = useTheme()
+  const { signOut } = useClerk()
+  const { user } = useUser()
+
+  if (!user) return null
 
   return (
     <SidebarMenu>
@@ -28,13 +31,18 @@ export function SidebarUserNav({ user }: { user: User }) {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent bg-background data-[state=open]:text-sidebar-accent-foreground h-10">
               <Image
-                src={`https://avatar.vercel.sh/${user.email}`}
-                alt={user.email ?? 'User Avatar'}
+                src={
+                  user.imageUrl ||
+                  `https://avatar.vercel.sh/${user.emailAddresses[0]?.emailAddress}`
+                }
+                alt={user.emailAddresses[0]?.emailAddress ?? "User Avatar"}
                 width={24}
                 height={24}
                 className="rounded-full"
               />
-              <span className="truncate">{user?.email}</span>
+              <span className="truncate">
+                {user.emailAddresses[0]?.emailAddress}
+              </span>
               <ChevronUp className="ml-auto" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
@@ -44,20 +52,16 @@ export function SidebarUserNav({ user }: { user: User }) {
           >
             <DropdownMenuItem
               className="cursor-pointer"
-              onSelect={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              onSelect={() => setTheme(theme === "dark" ? "light" : "dark")}
             >
-              {`Toggle ${theme === 'light' ? 'dark' : 'light'} mode`}
+              {`Toggle ${theme === "light" ? "dark" : "light"} mode`}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <button
                 type="button"
                 className="w-full cursor-pointer"
-                onClick={() => {
-                  signOut({
-                    redirectTo: '/',
-                  });
-                }}
+                onClick={() => signOut()}
               >
                 Sign out
               </button>
@@ -66,5 +70,5 @@ export function SidebarUserNav({ user }: { user: User }) {
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  );
+  )
 }

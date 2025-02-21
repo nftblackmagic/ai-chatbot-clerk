@@ -1,62 +1,62 @@
-'use client';
+"use client"
 
-import { updateChatVisibility } from '@/app/(chat)/actions';
-import { VisibilityType } from '@/components/visibility-selector';
-import { Chat } from '@/lib/db/schema';
-import { useMemo } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
+import { updateChatVisibility } from "@/app/(chat)/actions"
+import { VisibilityType } from "@/components/visibility-selector"
+import { SelectChat } from "@/lib/db/schema"
+import { useMemo } from "react"
+import useSWR, { useSWRConfig } from "swr"
 
 export function useChatVisibility({
   chatId,
-  initialVisibility,
+  initialVisibility
 }: {
-  chatId: string;
-  initialVisibility: VisibilityType;
+  chatId: string
+  initialVisibility: VisibilityType
 }) {
-  const { mutate, cache } = useSWRConfig();
-  const history: Array<Chat> = cache.get('/api/history')?.data;
+  const { mutate, cache } = useSWRConfig()
+  const history: Array<SelectChat> = cache.get("/api/history")?.data
 
   const { data: localVisibility, mutate: setLocalVisibility } = useSWR(
     `${chatId}-visibility`,
     null,
     {
-      fallbackData: initialVisibility,
-    },
-  );
+      fallbackData: initialVisibility
+    }
+  )
 
   const visibilityType = useMemo(() => {
-    if (!history) return localVisibility;
-    const chat = history.find((chat) => chat.id === chatId);
-    if (!chat) return 'private';
-    return chat.visibility;
-  }, [history, chatId, localVisibility]);
+    if (!history) return localVisibility
+    const chat = history.find(chat => chat.id === chatId)
+    if (!chat) return "private"
+    return chat.visibility
+  }, [history, chatId, localVisibility])
 
   const setVisibilityType = (updatedVisibilityType: VisibilityType) => {
-    setLocalVisibility(updatedVisibilityType);
+    setLocalVisibility(updatedVisibilityType)
 
-    mutate<Array<Chat>>(
-      '/api/history',
-      (history) => {
+    mutate<Array<SelectChat>>(
+      "/api/history",
+      history => {
         return history
-          ? history.map((chat) => {
+          ? history.map(chat => {
               if (chat.id === chatId) {
                 return {
                   ...chat,
-                  visibility: updatedVisibilityType,
-                };
+                  visibility: updatedVisibilityType
+                }
               }
-              return chat;
+              return chat
             })
-          : [];
+          : []
       },
-      { revalidate: false },
-    );
+      { revalidate: false }
+    )
 
     updateChatVisibility({
       chatId: chatId,
-      visibility: updatedVisibilityType,
-    });
-  };
+      visibility: updatedVisibilityType
+    })
+  }
 
-  return { visibilityType, setVisibilityType };
+  return { visibilityType, setVisibilityType }
 }

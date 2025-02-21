@@ -1,26 +1,27 @@
-'use client';
+"use client"
 
-import type { User } from 'next-auth';
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation"
+import { useAuth } from "@clerk/nextjs"
 
-import { PlusIcon } from '@/components/icons';
-import { SidebarHistory } from '@/components/sidebar-history';
-import { SidebarUserNav } from '@/components/sidebar-user-nav';
-import { Button } from '@/components/ui/button';
+import { PlusIcon } from "@/components/icons"
+import { SidebarHistory } from "@/components/sidebar-history"
+import { SidebarUserNav } from "@/components/sidebar-user-nav"
+import { Button } from "@/components/ui/button"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarMenu,
-  useSidebar,
-} from '@/components/ui/sidebar';
-import Link from 'next/link';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+  useSidebar
+} from "@/components/ui/sidebar"
+import Link from "next/link"
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 
-export function AppSidebar({ user }: { user: User | undefined }) {
-  const router = useRouter();
-  const { setOpenMobile } = useSidebar();
+export function AppSidebar() {
+  const router = useRouter()
+  const { userId } = useAuth()
+  const { setOpenMobile } = useSidebar()
 
   return (
     <Sidebar className="group-data-[side=left]:border-r-0">
@@ -30,7 +31,7 @@ export function AppSidebar({ user }: { user: User | undefined }) {
             <Link
               href="/"
               onClick={() => {
-                setOpenMobile(false);
+                setOpenMobile(false)
               }}
               className="flex flex-row gap-3 items-center"
             >
@@ -45,9 +46,9 @@ export function AppSidebar({ user }: { user: User | undefined }) {
                   type="button"
                   className="p-2 h-fit"
                   onClick={() => {
-                    setOpenMobile(false);
-                    router.push('/');
-                    router.refresh();
+                    setOpenMobile(false)
+                    router.push("/")
+                    router.refresh()
                   }}
                 >
                   <PlusIcon />
@@ -59,9 +60,9 @@ export function AppSidebar({ user }: { user: User | undefined }) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarHistory user={user} />
+        <SidebarHistory user={userId} />
       </SidebarContent>
-      <SidebarFooter>{user && <SidebarUserNav user={user} />}</SidebarFooter>
+      <SidebarFooter>{userId && <SidebarUserNav />}</SidebarFooter>
     </Sidebar>
-  );
+  )
 }

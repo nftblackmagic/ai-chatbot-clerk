@@ -1,35 +1,35 @@
-'use client';
+"use client"
 
-import type { Attachment, Message } from 'ai';
-import { useChat } from 'ai/react';
-import { useState } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
+import type { Attachment, Message } from "ai"
+import { useChat } from "ai/react"
+import { useState } from "react"
+import useSWR, { useSWRConfig } from "swr"
 
-import { ChatHeader } from '@/components/chat-header';
-import type { Vote } from '@/lib/db/schema';
-import { fetcher, generateUUID } from '@/lib/utils';
+import { ChatHeader } from "@/components/chat-header"
+import type { SelectVote } from "@/lib/db/schema"
+import { fetcher, generateUUID } from "@/lib/utils"
 
-import { Artifact } from './artifact';
-import { MultimodalInput } from './multimodal-input';
-import { Messages } from './messages';
-import { VisibilityType } from './visibility-selector';
-import { useArtifactSelector } from '@/hooks/use-artifact';
-import { toast } from 'sonner';
+import { Artifact } from "./artifact"
+import { MultimodalInput } from "./multimodal-input"
+import { Messages } from "./messages"
+import { VisibilityType } from "./visibility-selector"
+import { useArtifactSelector } from "@/hooks/use-artifact"
+import { toast } from "sonner"
 
 export function Chat({
   id,
   initialMessages,
   selectedChatModel,
   selectedVisibilityType,
-  isReadonly,
+  isReadonly
 }: {
-  id: string;
-  initialMessages: Array<Message>;
-  selectedChatModel: string;
-  selectedVisibilityType: VisibilityType;
-  isReadonly: boolean;
+  id: string
+  initialMessages: Array<Message>
+  selectedChatModel: string
+  selectedVisibilityType: VisibilityType
+  isReadonly: boolean
 }) {
-  const { mutate } = useSWRConfig();
+  const { mutate } = useSWRConfig()
 
   const {
     messages,
@@ -40,7 +40,7 @@ export function Chat({
     append,
     isLoading,
     stop,
-    reload,
+    reload
   } = useChat({
     id,
     body: { id, selectedChatModel: selectedChatModel },
@@ -49,20 +49,20 @@ export function Chat({
     sendExtraMessageFields: true,
     generateId: generateUUID,
     onFinish: () => {
-      mutate('/api/history');
+      mutate("/api/history")
     },
-    onError: (error) => {
-      toast.error('An error occured, please try again!');
-    },
-  });
+    onError: error => {
+      toast.error("An error occured, please try again!")
+    }
+  })
 
-  const { data: votes } = useSWR<Array<Vote>>(
+  const { data: votes } = useSWR<Array<SelectVote>>(
     `/api/vote?chatId=${id}`,
-    fetcher,
-  );
+    fetcher
+  )
 
-  const [attachments, setAttachments] = useState<Array<Attachment>>([]);
-  const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
+  const [attachments, setAttachments] = useState<Array<Attachment>>([])
+  const isArtifactVisible = useArtifactSelector(state => state.isVisible)
 
   return (
     <>
@@ -121,5 +121,5 @@ export function Chat({
         isReadonly={isReadonly}
       />
     </>
-  );
+  )
 }
