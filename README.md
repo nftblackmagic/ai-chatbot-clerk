@@ -30,8 +30,9 @@
 - Data Persistence
   - [Vercel Postgres powered by Neon](https://vercel.com/storage/postgres) for saving chat history and user data
   - [Vercel Blob](https://vercel.com/storage/blob) for efficient file storage
-- [NextAuth.js](https://github.com/nextauthjs/next-auth)
+- [clerk](https://clerk.com)
   - Simple and secure authentication
+- [Drizzle](https://orm.drizzle.team/)
 
 ## Model Providers
 
